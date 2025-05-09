@@ -1,0 +1,124 @@
+6.  
+Develop an application to Check the Weather in Countries Across the world (Weather app) 
+ 
+ 
+import 'dart:convert'; 
+import 'package:flutter/material.dart'; 
+import 'package:http/http.dart' as http; 
+ 
+void main() { 
+  runApp(WeatherApp()); 
+} 
+ 
+class WeatherApp extends StatelessWidget { 
+  @override 
+  Widget build(BuildContext context) { 
+    return MaterialApp( 
+      theme: ThemeData.dark(), 
+      home: WeatherScreen(), 
+      debugShowCheckedModeBanner: false, 
+    ); 
+  } 
+} 
+ 
+class WeatherScreen extends StatefulWidget { 
+  @override 
+  _WeatherScreenState createState() => _WeatherScreenState(); 
+} 
+ 
+class _WeatherScreenState extends State<WeatherScreen> { 
+  final TextEditingController _cityController = TextEditingController(); 
+  String _weather = ''; 
+  String _temperature = ''; 
+  String _description = ''; 
+  String _icon = ''; 
+ 
+  Future<void> _fetchWeather(String city) async { 
+    final apiKey = 'YOUR_OPENWEATHERMAP_API_KEY'; // Replace with your API key 
+    final url = Uri.parse( 
+        'https://api.openweathermap.org/data/2.5/weather?q=$city&appid=$apiKey&units=metric'); 
+ 
+    try { 
+      final response = await http.get(url); 
+      if (response.statusCode == 200) { 
+        final data = json.decode(response.body); 
+        setState(() { 
+          _weather = data['weather'][0]['main']; 
+          _description = data['weather'][0]['description']; 
+          _temperature = '${data['main']['temp']} °C'; 
+          _icon = 
+              'https://openweathermap.org/img/wn/${data['weather'][0]['icon']}@2x.png'; 
+        }); 
+      } else { 
+        setState(() { 
+          _weather = 'City not found'; 
+          _description = ''; 
+          _temperature = ''; 
+          _icon = ''; 
+        }); 
+      } 
+    } catch (e) { 
+      setState(() { 
+        _weather = 'Error fetching weather'; 
+        _description = ''; 
+        _temperature = ''; 
+        _icon = ''; 
+      }); 
+    } 
+  } 
+ 
+  @override 
+  Widget build(BuildContext context) { 
+    return Scaffold( 
+      appBar: AppBar(title: Text('Weather App')), 
+      body: Padding( 
+        padding: EdgeInsets.all(16), 
+        child: Column( 
+          children: [ 
+            TextField( 
+              controller: _cityController, 
+              decoration: InputDecoration( 
+                labelText: 'Enter City', 
+                border: OutlineInputBorder(), 
+              ), 
+            ), 
+            SizedBox(height: 16), 
+            ElevatedButton( 
+              onPressed: () { 
+                _fetchWeather(_cityController.text); 
+              }, 
+              child: Text('Get Weather'), 
+            ), 
+            SizedBox(height: 32), 
+            if (_weather.isNotEmpty) ...[ 
+              Image.network(_icon), 
+              Text( 
+                _weather, 
+                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold), 
+              ), 
+              Text( 
+                _description, 
+                style: TextStyle(fontSize: 20), 
+              ), 
+              Text( 
+                _temperature, 
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold), 
+              ), 
+            ], 
+          ], 
+        ), 
+      ), 
+    ); 
+} 
+} 
+Add Dependencies 
+Open pubspec.yaml and add the following dependencies: 
+yaml 
+Copy code 
+dependencies: 
+flutter: 
+sdk: flutter 
+http: ^1.2.0 
+Get an OpenWeatherMap API Key 
+Go to https://openweathermap.org 
+Sign up and create an API key

@@ -139,4 +139,8 @@ class _ExpenseHomePageState extends State<ExpenseHomePage> {
     ); 
   } 
 } 
+dependencies: 
+  flutter: 
+    sdk: flutter 
+  fl_chart: ^0.66.0 
  
